@@ -50,8 +50,15 @@ js/canvas.js is the main part of the project. js/index.js is there as a test are
 
 ## Admissions ##
 
-First, you may notice that there are some similarities here with AS3. I wish to make clear that the goal is not to re-write Flash, but I do . . . uh, borrow a few ideas from it. I have extensive background in Flash ans AS3, so it's just a part of how I think.
+First, you may notice that there are some similarities here with AS3. I wish to make clear that the goal is not to re-write Flash, but I do borrow a few ideas from it. I have extensive background in AS3, so it's just a part of how I think.
 
 Second, this is not fully tested code, and there is a lot more I want to do with it. At this point I think I have spent almost as much time on the documentation as I have on the code itself. My primary test involves using body as my stage container. While I get the wisdom in allowing multiple containers on a page, it is not yet tested; but i hope I have the roots in place.
 
 Third, yes you will still have to handle the drawing of your objects. There are a few functions in CanvasObject that are there to help, but I would still consider them limited at best. So, if you want certain things to work (such as x, y, and alpha) you will need to consider them in your draw function.
+
+## TODO ##
+
++ collision testing
++ easily add image without editing draw function
++ be able to create CanvasObject without having to extend the class
++ set up standard CanvasObject extend template
