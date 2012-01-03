@@ -62,3 +62,4 @@ Third, yes you will still have to handle the drawing of your objects. There are 
 + easily add image without editing draw function
 + be able to create CanvasObject without having to extend the class
 + set up standard CanvasObject extend template
++ asset management
