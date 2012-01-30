@@ -19,8 +19,6 @@ var Ball = new Class({
         {
             this.color = color;
         }
-        
-        
     },
     
     added: function(){
@@ -69,9 +67,6 @@ var Ball = new Class({
     }
 });
 
-
-
-
 var Backdrop = new Class({
 
     Extends: CanvasObject,
@@ -92,7 +87,15 @@ document.addEvent("domready", function(){
    var ball = l1.addChild(new Ball());
    var ball2 = l1.addChild(new Ball("#0000FF"));
    
-   var bkg = backdrop.addChild(new Backdrop());
+   var bkg = backdrop.addChild(new CanvasObject({
+        draw: function(){
+            console.log(this.rectangle);            
+            this.rectangle(this.stage.width, this.stage.height, "#000000");
+                    
+        }
+   }));
+   
+   //var bkg = backdrop.addChild(new Backdrop());
    
    
    ball2.vx = -5.5;

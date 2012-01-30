@@ -59,7 +59,7 @@ Third, yes you will still have to handle the drawing of your objects. There are 
 ## TODO ##
 
 + collision testing
-+ easily add image without editing draw function
++ easily add image for editing draw function
 + be able to create CanvasObject without having to extend the class
 + set up standard CanvasObject extend template
 + asset management (loading images, etc.)

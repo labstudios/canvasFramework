@@ -142,8 +142,13 @@ var Layer = new Class({
 
 var CanvasObject = new Class({
 
-    Implements: [Events],
+    Implements: [Options, Events],
     
+    options:{
+        init:null,        
+        draw:null      
+    },
+            
     stage: null,
     layer: null,
     context: null,
@@ -151,9 +156,19 @@ var CanvasObject = new Class({
     y: 0,
     alpha: 1,
     
-    initialize: function()
+    initialize: function(options)
     {
-        this.addEvent(Event.RENDER, this.draw.bind(this));
+        this.setOptions(options);
+        this.options.init ? this.options.init.call(this):null;
+        if(this.options.draw)
+        {
+            this.draw = this.options.draw.bind(this);         
+            this.addEvent(Event.RENDER, this.draw.bind(this));
+        }
+        else
+        {
+            this.addEvent(Event.RENDER, this.draw.bind(this));   
+        }
     },
     
     run: function()
