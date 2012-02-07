@@ -13,12 +13,14 @@ var Ball = new Class({
     initialize: function(color)
     {
         this.parent();
-        this.addEvent(Event.ENTER_FRAME, this.onEnterFrame.bind(this));
-        this.addEvent(Event.ADDED_TO_STAGE, this.added.bind(this));
+        this.addEvent(FrameEvent.ENTER_FRAME, this.onEnterFrame.bind(this));
+        this.addEvent(FrameEvent.ADDED_TO_STAGE, this.added.bind(this));
         if(color)
         {
             this.color = color;
         }
+        
+        this.setHitBounds(50, 50, RegPoints.CENTER);
     },
     
     added: function(){
@@ -95,12 +97,8 @@ document.addEvent("domready", function(){
         }
    }));
    
-   //var bkg = backdrop.addChild(new Backdrop());
-   
-   
    ball2.vx = -5.5;
    ball2.vy = 5.5;
-   Stage.instance().startRunning();
    
-    
+   ball2.hitTestObject({}); 
 });

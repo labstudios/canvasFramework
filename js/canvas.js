@@ -2,12 +2,80 @@ Class.Mutators.Static = function(members){
     this.extend(members);
 };
 
-var Event = {
+var FrameEvent = {
     ADDED_TO_STAGE: "addedToStage",
     ENTER_FRAME: "enterFrame",
     EXIT_FRAME: "exitFrame",
     RENDER: "render"
 };
+
+var RegPoints = {
+	TOP_LEFT: "tl",
+	TOP_RIGHT: "tr",
+	TOP_CENTER: "tc",
+	CENTER: "cc",
+	CENTER_LEFT: "cl",
+	CENTER_RIGHT: "cr",
+	BOTTOM_LEFT: "bl",
+	BOTTOM_RIGHT: "br",
+	BOTTOM_CENTER: "bc"
+};
+
+/**
+ * A simple point class to handle XY Coords
+ * @author	Brent Allen
+ */
+var Point = new Class({
+	
+	x:0,
+	y:0,
+	
+	initialize: function(xcoord, ycoord)
+	{
+		this.x = xcoord == null ? 0:xcoord;
+		this.y = ycoord == null ? 0:ycoord;
+	}
+});
+
+/**
+ * A simple point class to handle XY Coords
+ * @author	Brent Allen
+ */
+var BoundingBox = new Class({
+	
+	x:0,
+	y:0,
+	width: 0,
+	height: 0,
+	
+	initialize: function(xcoord, ycoord, w,h)
+	{
+		this.x = xcoord == null ? 0:xcoord;
+		this.y = ycoord == null ? 0:ycoord;
+		this.width = w == null ? 0:w;
+		this.height = h == null ? 0:h;
+	},
+	
+	left: function()
+	{
+		return this.x;
+	},
+	
+	right: function()
+	{
+		return this.x + this.width;
+	},
+	
+	top: function()
+	{
+		return this.y;
+	},
+	
+	bottom: function()
+	{
+		return this.y + this.height;
+	}
+});
 
 /**
  * Handles adding layers and telling them to animate
@@ -35,7 +103,8 @@ var Stage = new Class({
         fullWindow:true,
         fps: 24,
         width: 50,
-        height: 50
+        height: 50,
+        autoRun: true
     },
     
     fps: 24,
@@ -55,6 +124,10 @@ var Stage = new Class({
         this.width = this.options.width;
         this.height = this.options.height;
         this.fps = this.options.fps;
+        if(this.options.autoRun)
+        {
+			this.startRunning();
+        }
     },
     
     addLayer:function(layer)
@@ -135,7 +208,7 @@ var Layer = new Class({
         co.stage = this.stage;
         co.layer = this;
         co.context = this.context;
-        co.fireEvent(Event.ADDED_TO_STAGE);
+        co.fireEvent(FrameEvent.ADDED_TO_STAGE);
         return co;
     }
 });
@@ -146,7 +219,10 @@ var CanvasObject = new Class({
     
     options:{
         init:null,        
-        draw:null      
+        draw:null,
+        width: 0,
+        height: 0,
+        topLeft: 0
     },
             
     stage: null,
@@ -154,6 +230,11 @@ var CanvasObject = new Class({
     context: null,
     x: 0,
     y: 0,
+    width: 0,
+    height: 0,
+    topLeft: 0,
+    registrationPos: RegPoints.TOP_LEFT,
+    hitBox: null,
     alpha: 1,
     
     initialize: function(options)
@@ -163,24 +244,77 @@ var CanvasObject = new Class({
         if(this.options.draw)
         {
             this.draw = this.options.draw.bind(this);         
-            this.addEvent(Event.RENDER, this.draw.bind(this));
+            this.addEvent(FrameEvent.RENDER, this.draw.bind(this));
         }
         else
         {
-            this.addEvent(Event.RENDER, this.draw.bind(this));   
+            this.addEvent(FrameEvent.RENDER, this.draw.bind(this));   
         }
     },
     
     run: function()
     {
-        this.fireEvent(Event.ENTER_FRAME);
-        this.fireEvent(Event.RENDER);
-        this.fireEvent(Event.EXIT_FRAME);
+        this.fireEvent(FrameEvent.ENTER_FRAME);
+        this.fireEvent(FrameEvent.RENDER);
+        this.fireEvent(FrameEvent.EXIT_FRAME);
     },
     
     draw: function()
     {
         //polymorphosize
+    },
+    
+    setHitBounds: function(width, height, regPos)
+    {
+		width = width == null ? 0:width;
+		height = height == null ? 0:height;
+		this.registrationPos = regPos == null ? this.registrationPos:regPos;
+    	
+    	var firstCoord = this.registrationPos[0];
+    	var secondCoord = this.registrationPos[1];
+    	var x = 0;
+    	var y = 0;
+    	if(firstCoord == 't')
+    	{
+    		y = -height/2;
+    	}
+    	else if(firstCoord == 'b')
+    	{
+    		y = height/2;
+    	}
+    	if(secondCoord == 'l')
+    	{
+    		x = -width/2;
+    	}
+    	else if(secondCoord == 'r')
+    	{
+    		x = width/2;
+    	}
+    	
+    	this.hitBox = new BoundingBox(x,y,width, height);
+    },
+    
+    hitTestObject: function(cobj)
+    {
+    	if(instanceOf(cobj, CanvasObject) && cobj.hitBox && this.hitBox)
+    	{
+    		var bbox1 = new BoundingBox(this.x + this.hitBox.x, this.y + this.hitBox.y, this.hitBox.width, this.hitBox.height);
+    		var bbox2 = new BoundingBox(cobj.x + cobj.hitBox.x, cobj.y + cobj.hitBox.y, cobj.hitBox.width, cobj.hitBox.height);
+    		
+    		//check left and right sides
+    		if((bbox1.left() > bbox2.left() && bbox1.left() < bbox2.right() ) ||
+    			(bbox2.left() > bbox1.left() && bbox2.left() < bbox1.right() ))
+    		{
+    			//now check top and bottom
+    			if((bbox1.top() > bbox2.top() && bbox1.top() < bbox2.bottom() ) ||
+    				(bbox2.top() > bbox1.top() && bbox2.top() < bbox1.bottom() ))
+    			{
+    				return true;	
+    			}
+    		}
+    	}
+    	
+    	return false;
     },
     
     centeredCircle: function(radius, color)
