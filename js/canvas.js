@@ -2,7 +2,7 @@ Class.Mutators.Static = function(members){
     this.extend(members);
 };
 
-var Event = {
+var FrameEvent = {
     ADDED_TO_STAGE: "addedToStage",
     ENTER_FRAME: "enterFrame",
     EXIT_FRAME: "exitFrame",
@@ -35,7 +35,8 @@ var Stage = new Class({
         fullWindow:true,
         fps: 24,
         width: 50,
-        height: 50
+        height: 50,
+        autoRun: true
     },
     
     fps: 24,
@@ -55,6 +56,10 @@ var Stage = new Class({
         this.width = this.options.width;
         this.height = this.options.height;
         this.fps = this.options.fps;
+        if(this.options.autoRun)
+        {
+			this.startRunning();
+        }
     },
     
     addLayer:function(layer)
@@ -135,7 +140,7 @@ var Layer = new Class({
         co.stage = this.stage;
         co.layer = this;
         co.context = this.context;
-        co.fireEvent(Event.ADDED_TO_STAGE);
+        co.fireEvent(FrameEvent.ADDED_TO_STAGE);
         return co;
     }
 });
@@ -163,19 +168,19 @@ var CanvasObject = new Class({
         if(this.options.draw)
         {
             this.draw = this.options.draw.bind(this);         
-            this.addEvent(Event.RENDER, this.draw.bind(this));
+            this.addEvent(FrameEvent.RENDER, this.draw.bind(this));
         }
         else
         {
-            this.addEvent(Event.RENDER, this.draw.bind(this));   
+            this.addEvent(FrameEvent.RENDER, this.draw.bind(this));   
         }
     },
     
     run: function()
     {
-        this.fireEvent(Event.ENTER_FRAME);
-        this.fireEvent(Event.RENDER);
-        this.fireEvent(Event.EXIT_FRAME);
+        this.fireEvent(FrameEvent.ENTER_FRAME);
+        this.fireEvent(FrameEvent.RENDER);
+        this.fireEvent(FrameEvent.EXIT_FRAME);
     },
     
     draw: function()

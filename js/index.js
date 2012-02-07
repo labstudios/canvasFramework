@@ -13,8 +13,8 @@ var Ball = new Class({
     initialize: function(color)
     {
         this.parent();
-        this.addEvent(Event.ENTER_FRAME, this.onEnterFrame.bind(this));
-        this.addEvent(Event.ADDED_TO_STAGE, this.added.bind(this));
+        this.addEvent(FrameEvent.ENTER_FRAME, this.onEnterFrame.bind(this));
+        this.addEvent(FrameEvent.ADDED_TO_STAGE, this.added.bind(this));
         if(color)
         {
             this.color = color;
@@ -100,7 +100,7 @@ document.addEvent("domready", function(){
    
    ball2.vx = -5.5;
    ball2.vy = 5.5;
-   Stage.instance().startRunning();
+   //Stage.instance().startRunning();
    
     
 });
