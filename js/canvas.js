@@ -9,6 +9,17 @@ var FrameEvent = {
     RENDER: "render"
 };
 
+var MouseEvent = {
+	CLICK: "click",
+	MOUSE_OVER: "mouseover",
+	MOUSE_OUT: "mouseout",
+	MOUSE_ENTER: "mouseenter",
+	MOUSE_LEAVE: "mouseleave",
+	MOUSE_MOVE: "mousemove",
+	MOUSE_UP: "mouseup",
+	MOUSE_DOWN: "mousedown"
+};
+
 var RegPoints = {
 	TOP_LEFT: "tl",
 	TOP_RIGHT: "tr",
@@ -162,7 +173,8 @@ var Layer = new Class({
         autoAdd: true
     },
     options:{
-        animate:true
+        animate:true,
+        enableMouseEvents: false
     },
     stage:null,
     children: new Array(),
@@ -188,6 +200,10 @@ var Layer = new Class({
         });
         this.context = this.element.getContext("2d");
         Layer.autoAdd ? this.stage.addLayer(this):null;
+        if(this.options.enableMouseEvents)
+        {
+        	//add events to the layer
+        }
     },
     
     build:function()

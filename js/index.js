@@ -9,10 +9,17 @@ var Ball = new Class({
     vy: 7,
     radius: 25,
     color: "#FF0000",
+    lastHit: 0,
+    hitSpace: 5,
+    
+    Static:{
+    	allBalls: new Array()
+    },
     
     initialize: function(color)
     {
         this.parent();
+        Ball.allBalls.push(this);
         this.addEvent(FrameEvent.ENTER_FRAME, this.onEnterFrame.bind(this));
         this.addEvent(FrameEvent.ADDED_TO_STAGE, this.added.bind(this));
         if(color)
@@ -25,7 +32,7 @@ var Ball = new Class({
     
     added: function(){
        this.x = (Math.random() * (this.stage.width - 100)) + 50;
-       this.y = (Math.random() * (this.stage.height - 100)) + 50;  
+       this.y = (Math.random() * (this.stage.height - 100)) + 50;
     },
     
     onEnterFrame: function()
@@ -40,6 +47,22 @@ var Ball = new Class({
         if(this.top() < 0 || this.bottom() > this.stage.height)
         {
             this.vy *= -1;
+        }
+        
+        this.lastHit--;
+        if(this.lastHit <= 0)
+        {
+        	this.lastHit = 0;
+        }
+        for(var i = 0; i < Ball.allBalls.length; i++)
+        {
+        	var curBall = Ball.allBalls[i];
+        	if(curBall != this && this.hitTestObject(curBall) && this.lastHit <= 0)
+        	{
+        		this.lastHit = this.hitSpace;
+        		this.vx *= -1;
+        		this.vy *= -1;
+        	}
         }
     },
     
@@ -88,17 +111,19 @@ document.addEvent("domready", function(){
    
    var ball = l1.addChild(new Ball());
    var ball2 = l1.addChild(new Ball("#0000FF"));
+   var ball3 = l1.addChild(new Ball());
+   var ball4 = l1.addChild(new Ball());
+   var ball5 = l1.addChild(new Ball());
+   var ball6 = l1.addChild(new Ball());
+   var ball7 = l1.addChild(new Ball());
+   var ball8 = l1.addChild(new Ball());
    
    var bkg = backdrop.addChild(new CanvasObject({
         draw: function(){
-            console.log(this.rectangle);            
-            this.rectangle(this.stage.width, this.stage.height, "#000000");
-                    
+            this.rectangle(this.stage.width, this.stage.height, "#000000");        
         }
    }));
    
    ball2.vx = -5.5;
    ball2.vy = 5.5;
-   
-   ball2.hitTestObject({}); 
 });
