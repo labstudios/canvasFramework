@@ -131,10 +131,17 @@ var Stage = new Class({
             this.options.width = window.innerWidth;
             this.options.height = window.innerHeight;
         }
+        this.element.setStyle("position", "relative");
         this.setOptions(options);
         this.width = this.options.width;
         this.height = this.options.height;
         this.fps = this.options.fps;
+        
+        if(true)//in case I want to be able to turn it off later
+        {
+        	this.element.addEvent(MouseEvent.CLICK, this.mouseResponder.bind(this));
+        }
+        
         if(this.options.autoRun)
         {
 			this.startRunning();
@@ -144,7 +151,6 @@ var Stage = new Class({
     addLayer:function(layer)
     {
         this.layers.push(layer);
-        this.element.set("html", "");
         this.layers.each(function(layer)
         {
             layer.element.inject(this.element);
@@ -154,6 +160,14 @@ var Stage = new Class({
     startRunning:function()
     {
         this.run.periodical(1000/this.fps, this);
+    },
+    
+    mouseResponder: function(ev)
+    {
+    	for(var i = 0; i < this.layers.length; ++i)
+    	{
+    		this.layers[i].options.enableMouseEvents ? this.layers[i].mouseResponder(ev):null;
+    	}
     },
     
     run: function()
@@ -174,7 +188,7 @@ var Layer = new Class({
     },
     options:{
         animate:true,
-        enableMouseEvents: false
+        enableMouseEvents: true
     },
     stage:null,
     children: new Array(),
@@ -200,10 +214,6 @@ var Layer = new Class({
         });
         this.context = this.element.getContext("2d");
         Layer.autoAdd ? this.stage.addLayer(this):null;
-        if(this.options.enableMouseEvents)
-        {
-        	//add events to the layer
-        }
     },
     
     build:function()
@@ -226,6 +236,11 @@ var Layer = new Class({
         co.context = this.context;
         co.fireEvent(FrameEvent.ADDED_TO_STAGE);
         return co;
+    },
+    
+    mouseResponder: function(ev)
+    {
+    	console.log("I got the event");
     }
 });
 
