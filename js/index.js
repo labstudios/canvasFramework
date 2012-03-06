@@ -28,6 +28,7 @@ var Ball = new Class({
         }
         
         this.setHitBounds(50, 50, RegPoints.CENTER);
+        this.addEvent(MouseEvent.CLICK, this.clicked.bind(this));
     },
     
     added: function(){
@@ -64,6 +65,11 @@ var Ball = new Class({
         		this.vy *= -1;
         	}
         }
+    },
+    
+    clicked: function()
+    {
+        this.color = "#00ff00";
     },
     
     draw: function()

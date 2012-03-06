@@ -122,6 +122,7 @@ var Stage = new Class({
     width: 50,
     height: 50,
     layers: new Array(),
+    period: 0,
     
     initialize: function(element, options)
     {
@@ -131,7 +132,6 @@ var Stage = new Class({
             this.options.width = window.innerWidth;
             this.options.height = window.innerHeight;
         }
-        this.element.setStyle("position", "relative");
         this.setOptions(options);
         this.width = this.options.width;
         this.height = this.options.height;
@@ -159,7 +159,7 @@ var Stage = new Class({
     
     startRunning:function()
     {
-        this.run.periodical(1000/this.fps, this);
+        this.period = this.run.periodical(1000/this.fps, this);
     },
     
     mouseResponder: function(ev)
@@ -176,6 +176,16 @@ var Stage = new Class({
         {
             layer.build();
         }, this);
+    },
+    
+    remove: function()
+    {
+        clearInterval(this.period);
+        for(var i = 0; i < this.layers.length; ++i)
+    	{
+    	   this.layers[i].element.destroy();
+   		}
+        this.layers = new Array();
     }
 });
 
@@ -240,7 +250,34 @@ var Layer = new Class({
     
     mouseResponder: function(ev)
     {
-    	console.log("I got the event");
+    	for(var i = 0; i < this.children.length;++i)
+        {
+            var co = this.children[i];
+            if(co.hitBox)
+            {
+                var bbox = new BoundingBox(co.x + co.hitBox.x, co.y + co.hitBox.y, co.hitBox.width, co.hitBox.height);
+                if(ev.event.clientX > bbox.left() && ev.event.clientX < bbox.right() &&
+                ev.event.clientY > bbox.top() && ev.event.clientY < bbox.bottom())
+                {
+                    switch(ev.type)
+                    {
+                        case MouseEvent.CLICK:
+                        case MouseEvent.MOUSE_DOWN:
+                        case MouseEvent.MOUSE_UP: 
+                            co.fireEvent(ev.type, ev);
+                        break;
+                        default:
+                            //nevermind, for now.
+                        break;
+                    }
+                    
+                    //This is fine for clicks, but to really track mouse events, we are going to have to look at the event
+                    //We will likely have to manually fire enter and leave events in the run function of CanvasObject in case
+                    //the object is animated
+                }
+            }
+        }
+        this.fireEvent(ev.type, ev);
     }
 });
 
@@ -305,7 +342,7 @@ var CanvasObject = new Class({
     	var secondCoord = this.registrationPos[1];
     	var x = 0;
     	var y = 0;
-    	if(firstCoord == 't')
+    	if(firstCoord == 'c')
     	{
     		y = -height/2;
     	}
@@ -313,7 +350,7 @@ var CanvasObject = new Class({
     	{
     		y = height/2;
     	}
-    	if(secondCoord == 'l')
+    	if(secondCoord == 'c')
     	{
     		x = -width/2;
     	}
